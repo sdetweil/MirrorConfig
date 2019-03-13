@@ -2,7 +2,7 @@
 <html ng-app="starter">
   <head>
     <meta charset="utf-8">
-	<meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">	
+	<meta http-equiv="Content-Security-Policy" content="default-src * gap://ready file:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">	
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
 
@@ -16,36 +16,599 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-	
-    <script src="lib/swiper/dist/js/swiper.js"></script>
-    <!--<script src="../bower_components/angular/angular.js"></script>-->
-    <script src="lib/angular-swiper/dist/angular-swiper.js"></script>	
 
+   <script src="lib/angular-swiper/dist/angular-swiper.js"></script>	
+ 
     <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
   </head>
-  <body ng-controller="CarouselController">
+  <body ng-controller="CarouselController" platform-android platform-ios platform-browser>
+<script type="text/javascript">
+        document.addEventListener("deviceready", onDeviceReady, false);
+					function onDeviceReady() {
+							try
+							{
+							   console.log("console.log works well");	
+							   //networkinterface.getIPAddress(function(ip){/*alert("have ip in ready="+ip)*/});				
+							}
+							catch(ex)
+							{
+								 console.log("error="+ex);
+							}
+					}
+    window.onerror = function(message, url, lineNumber) {
+        console.log("Error: "+message+" in "+url+" at line "+lineNumber);
+    }
+</script>
+</script>
+<style>
+.box1, .box2, .box3 , .box4{
+   border: 1px solid blue; 
+}
+.theroot {
+  background-color: white;
+}
+.colb {  
+	border: 1px solid black; 
+}
+.dashed-border {  
+	border: 1px  black dotted; 
+}
+.path {
+width: 800px;
+overflow: auto
+}
+.selected {
+    background-color:grey;
+    color:white;
+    font-weight:bold;
+}
+.slider {
+padding-bottom: 10px;
+}
 
-    <ion-pane>
-      <ion-header-bar class="bar-stable">
-        <h1 class="title">Ionic Blank Starter</h1>
-      </ion-header-bar>
-      <ion-content>
-		<ks-swiper-container initial-slide="3" speed="2000" loop="true" show-nav-buttons="false" slides-per-view="3" space-between="5" pagination-clickable="false" override-parameters="{effect: 'coverflow',coverflow: {rotate: 50,stretch: 0,depth: 100,modifier: 1,slideShadows : false}}"  on-ready="onReadySwiper(swiper)">
-			<ks-swiper-slide class="swiper-slide" ng-repeat="s in [1,2,3,4,5,6,7,8]">
-				<img ng-src="img/puppy-{{s}}.jpg" width="100%">
-			</ks-swiper-slide>			
-		</ks-swiper-container>
-		
-		<ks-swiper-container initial-slide="3" speed="2000" loop="true" show-nav-buttons="false" slides-per-view="4" space-between="0" pagination-clickable="false"  on-ready="onReadySwiper(swiper)">
-			<ks-swiper-slide class="swiper-slide" ng-repeat="s in [1,2,3,4,5,6,7,8]">
-				<img ng-src="img/puppy-{{s}}.jpg" width="100%">
-			</ks-swiper-slide>			
-		</ks-swiper-container>		
+.button-add {
+    background-image: url('img/add.png'); /* 16px x 16px */
+    background-color: black;  /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-position: 0px 0px;  /* equivalent to 'top left' */
+    border: none;           /* assuming we don't want any borders */
+    cursor: pointer;        /* make the cursor like hovering over an <a> element */
+    height: 32px;   
+    width: 32px;         /* make this the size of your image */
+    vertical-align: middle; /* align the text vertically centered */   
+}
+.button-edit {
+    background-image: url('img/edit.png'); /* 16px x 16px */
+    background-color: yellow; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-position: 0px 0px;  /* equivalent to 'top left' */
+    border: none;           /* assuming we don't want any borders */
+    cursor: pointer;        /* make the cursor like hovering over an <a> element */
+    height: 32px;            /* make this the size of your image */
+	  width: 32px;         /* make this the size of your image */    
+    vertical-align: middle; /* align the text vertically centered */
+}
+
+.main {
+  width: 100%;
+  border: 1px dotted black;
+  display: inline;
+}
+input {
+  float: left;
+}
+h2 {
+	display:inline;
+	text-align: center;
+	width:100%;
+	float:right;
+}
+.center{
+    vertical-align: middle;
+    text-align: center;   
+}
+.checkbox{
+    vertical-align: middle;
+    text-align: center;
+    padding:3%;
+    float:right;
+}
+.modal-wrapper {
+    position: absolute;
+    width: 90%;
+    height: 50%; 
+    top: 20%;
+    left: 5%;
+  }
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
+</style>
+    <ion-view>
+			<ion-content scroll="true" has-header="true">
+					
+					<ion-refresher on-Refresh="doRefresh($event)">								
+						<ion-refresher-content
+							pullingIcon="arrow-dropdown"
+							pullingText="Pull to refresh"
+							refreshingSpinner="android"
+							refreshingText="Refreshing...">
+						</ion-refresher-content>
+					</ion-refresher>  
+					<ion-slide-box does-continue="true"  show-pager="false">
+					
+<!-- slider page for Viewers -->
+					
+						<ion-slide>
+							<div class = "box box1">  						
+								<h2 >Viewers</h2>												 
+								<input  type="button"  	value="";						    
+											ng-class="{true:'button-add',false:'button-edit'}[$index == selectedRow.viewer]"
+											ng-click="addeditClicked(selectedRow.viewer,'viewer',{true:'add',false:'edit'}[$index == selectedRow.viewer])"/>
+								<ion-grid>											
+									<div class = "row">
+										<span class="col colb col-20 center">Name</span>
+										<span class="col colb col-20 center">Tags</span>
+										<span class="col colb center">Advance</span>
+										<span class="col colb center">Rate</span>
+										<span class="col colb center">Active</span>
+									</div>	
+
+									<ion-scroll direction="y" scrollY="true" class="theroot" style="width: {{dev_width}}px; height: 70vh"> 
+										<div class = "row" ng-repeat="viewer in viewers track by $index" 
+																			 on-hold="deleterow($index,'viewer')"
+																			 ng-class="{true:'selected',false:''}[$index == selectedRow.viewer]"
+																			 double-click="addeditClicked($index,'viewer','edit')">
+											 <span class = "col colb col-20" ng-click="setClickedRow($index,'viewer','Name')">{{viewer.Name}}</span>
+
+											 <span class="col colb col-20" ng-click="setClickedRow($index,'viewer','Tags')">
+												<!-- use an unordered list, with repeating line items to get array wrap -->
+											  <ul>
+											    <li ng-repeat="tag in viewer.Tags track by $index"><span ng-bind="tagfromID(tag)"></span></li>
+											  </ul>
+		  								 </span>
+											 <span class = "col colb  center " ng-click="setClickedRow($index,'viewer','Advance')">{{viewer.Advance}}</span>
+											 <span class = "col colb  center" ng-click="setClickedRow($index,'viewer','ImageRefreshRate')">{{viewer.ImageRefreshRate}}</span>
+											 <span class = "col colb  center" ng-click="setClickedRow($index,'viewer','Active')">{{viewer.Active}}</span> 
+										</div>
+									</ion-scroll>
+								</ion-grid>
+							</div>
+					 	</ion-slide>
+					 	
+<!-- slider page for DataSources -->
+
+						<ion-slide>
+							<div class = "box box2">						
+								<h2 >Data Sources</h2>
+								<input  type="button"  													
+												ng-class="{true:'button-add',false:'button-edit'}[$index == selectedRow.datasource]"
+												ng-click="addeditClicked(selectedRow.datasource,'datasource',{true:'add',false:'edit'}[$index == selectedRow.datasource])"/>										
+								<ion-grid>
+									<div class = "row">
+										<span class="col colb col-20 center">Name</span>
+										<span class="col colb col-20 center">Type</span>
+										<span class="col colb col-20 center">Active</span>
+										<span class="col colb center">Root</span>
+									</div>										
+									<ion-scroll direction="y" scrollY="true" class="theroot" style="width: {{dev_width}}px; height: 70vh"> 
+										<div class = "row"  ng-repeat="datasource in dataSources track by $index"									
+																			 on-hold="deleterow($index,'datasource')"
+																			  ng-class="{true:'selected',false:''}[$index == selectedRow.datasource]"
+																			  double-click="addeditClicked($index,'datasource','edit')">
+											 <span class = "col colb col-20" ng-click="setClickedRow($index,'datasource','Name')">{{datasource.Name}}</span>
+											 <span class = "col colb col-20 center" ng-click="setClickedRow($index,'datasource','Type')">{{datasource.Type.Type}}</span>
+											 <span class = "col colb col-20 center" ng-click="setClickedRow($index,'datasource','Active')">{{datasource.Active}}</span> 
+											 <span align="left" class="col colb path" ng-click="setClickedRow($index,'datasource','Root')">{{datasource.Root}}</span>
+										</div>
+									</ion-scroll> 									
+								</ion-grid>
+							</div>
+						</ion-slide>
+
+<!-- slider page for Images -->
+
+					 	<ion-slide>
+							<div class = "box box3" >					 
+								<h2  >Images</h2>
+								<input  type="button"  													
+												ng-class="{true:'button-add',false:'button-edit'}[$index == selectedRow.image]"
+												ng-click="addeditClicked(selectedRow.image,'image',{true:'add',false:'edit'}[$index == selectedRow.image])"/>
+								<ion-grid>												
+									<div class = "row">
+										<span class="col colb col-20 center">Name</span>
+										<span class="col colb col-20 center">Tags</span>
+										<span class="col colb col-20 center">Source</span>
+										<span class="col colb center">Path</span>
+									</div>												
+
+									<ion-scroll direction="y" scrollY="true" class="theroot" style="width: {{dev_width}}px; height: 70vh"> 
+									<div class = "row"  ng-repeat="image in images track by $index"
+																			on-hold="deleterow($index,'image')"
+																			 ng-class="{true:'selected',false:''}[$index == selectedRow.image]"
+																			 double-click="addeditClicked($index,'image','edit')"> 																		
+									  <span class = "col colb col-20" ng-click="setClickedRow($index,'image','Name')">{{image.Name}}</span>	
+
+										<span class="col colb col-20" ng-click="setClickedRow($index,'image','Tags')">
+											<!-- use an unordered list, with repeating line items to get array wrap -->
+											<ul>
+											 <li ng-repeat="tag in image.Tags track by $index"><span ng-bind="tagfromID(tag)"></span></li> 
+											</ul>
+										</span>
+
+									 <span class = "col colb col-20 center " ng-click="setClickedRow($index,'image','DataSource')"><span ng-bind="datasourcefromID(image.DataSource)"></span></span>
+									 <span class = "col colb path" ng-click="setClickedRow($index,'image','PathFromSource')">{{image.PathFromSource}}</span>		
+									 							
+									</div> 								
+								</ion-scroll> 
+							</ion-grid>
+						</div>
+					 </ion-slide>
+					 
+<!-- slider page for Tags -->
+
+					 <ion-slide>
+						 <div class = "box box4">					 
+							 <h2 >Tags</h2>
+							 <input  type="button"  													
+											ng-class="{true:'button-add',false:'button-edit'}[$index == selectedRow.tag]"
+											ng-click="addeditClicked(selectedRow.tag,'tag',{true:'add',false:'edit'}[$index == selectedRow.tag])"/>														
+							<ion-grid>	
+								<div class = "row">
+									<span class="col colb col-20 center">Value</span>
+									<span class="col colb center">Description</span>
+								</div>	
+								 <ion-scroll direction="y" scrollY="true" class="theroot" style="width: {{dev_width}}px; height: 70vh">
+									 <div class = "row"  ng-repeat="tag in tags track by $index"
+																			on-hold="deleterow($index,'tag')"
+																			 ng-class="{true:'selected',false:''}[$index == selectedRow.tag]"
+																			 double-click="addeditClicked($index,'tag','edit')">
+										 <span class = "col colb col-20" ng-click="setClickedRow($index,'tag','Value')">{{tag.value}}</span>
+										 <span class = "col colb" ng-click="setClickedRow($index,'tag','Description')">{{tag.Description}}</span>
+									</div>
+								</ion-scroll>
+							</ion-grid>
+						 </div>
+					 </ion-slide>					 
+				</ion-slide-box>
+			</ion-content>
+<!-- footer -->
+			<ion-footer-bar>
+				<div class="bar bar-footer" >
+				  <div class="row" style="clear: both;">
+				    <div class="col col-25">
+				      <button class="button icon-left ion-chevron-left button-calm alignleft" ng-click="back()">
+				        Back
+				      </button>
+				    </div>
+				    <div class="col col-50 ">
+				      <div >   </div> 
+				    </div>
+				    <div class="col col-25 " >
+				      <button class="button icon-right ion-chevron-right button-calm alignright" " ng-click="next()">
+				        Next
+				      </button>
+				    </div>
+		    	</div>
+		  	</div>
+			</ion-footer-bar>
+		</ion-view>
+
+<!---  viewer modal here ---> 
+    <script id="viewermodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false" >
+     
+    		<ion-header-bar>
+          <h1 class="title">{{modaltype}} Viewer</h1>
+
+    		</ion-header-bar>
+       <ion-content>     		
+				<ion-grid>
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vname">Name:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisviewer.Name" type="text" id="vname" align="left"/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vdescription">Description:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisviewer.Description" type="text" id="vdescription" align="left" />
+              </div>
+            </div>            
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vtags"> Tags:</label>
+            	</div>
+							<div class="col">
+								<select  style="width:85%;" id="vtags" ng-model="thisviewer.Tags" multiple  
+												 ng-options="tag._id as tag.value for tag in tags">    
+												 <!-- ng-options="tag.value as tag.value for tag in tags" -->
+								</select>
+            	</div>
+						</div>
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vdays">Days:</label>      
+            	</div>
+							<div class="col dashed-border">
+         				 <input ng-model="thisviewer.Advance" type="number" id="vdays" class="dashed-border"/>
+            	</div>
+						</div>
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vrate"> Rate:</label>
+            	</div>
+							<div class="col dashed-border">
+                <input ng-model="thisviewer.ImageRefreshRate" type="number" id="vrate" class="dashed-border"/>
+            	</div>
+           	</div>
+            <div class="row">
+              <div class="col col-20"> 
+            			<label for="vactive"> Active:</label>
+            	</div>
+							<div class="col">									
+         				 <input ng-model="thisviewer.Active" type="checkbox" id="vactive" ng-checked="thisviewer.Active==true"/> 
+            	</div>
+						</div>
+            <div class="row">
+              <div class="col"> 
+       				  <div class="button" ng-click="closeModal('viewer',thisviewer)">Cancel <span class="icon ion-close"></span>
+          			</div>
+          			<div class="button" ng-click="saveModal('viewer')">Save <span class="icon ion-done-all"></span>
+          			</div>
+             	</div>
+           	</div>
+        </ion-grid>
       </ion-content>
-    </ion-pane>
-  </body>
-</html>
+     </ion-modal>
+    </script>
+    
+<!---  datasource modal here ---> 
+    <script id="datasourcemodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false" >
+    		<ion-header-bar>
+
+          <h1 class="title">{{modaltype}} DataSource</h1>
+
+    		</ion-header-bar>
+    		<ion-content>
+					<ion-grid>
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vname" width="10">Name:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisdatasource.Name" type="text" id="vname" align="left" class="dashed-border"/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vdescription">Description:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisdatasource.Description" type="text" id="vdescription" align="left" class="dashed-border" />
+              </div>
+            </div>             
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vtypes"> Type:</label>
+            	</div>
+							<div class="col dashed-border">
+								<select style="max-width:70%;" id="vtypes" ng-model="thisdatasource.Type.Type"
+											ng-options="Type for Type in DataSourceTypes" ng-change="typeChange(thisdatasource)">    
+								</select>
+            	</div>
+						</div>            
+            <div class="row">
+              <div class="col col-20"> 
+            			<label for="vactive"> Active:</label>
+            	</div>
+							<div class="col">									
+         				 <input ng-model="thisdatasource.Active" type="checkbox" id="vactive" ng-checked="thisviewer.Active==true"/> 
+            	</div>
+						</div>            
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vroot"> Root:</label>
+            	</div>
+							<div class="col col-50">              
+                <span id="vroot"  double-click="doubleClick(parentobject,true)" class="dashed-border">{{thisdatasource.Root}}</span>
+            	</div>
+           	</div>
+
+            <div class="row">
+              <div class="col"> 
+       				  <div class="button" ng-click="closeModal('datasource',thisdatasource)">Cancel <span class="icon ion-close"></span>
+          			</div>
+          			<div class="button" ng-click="saveModal('datasource')">Save <span class="icon ion-done-all"></span>
+          			</div>
+             	</div>
+           	</div>
+        </ion-grid>
+      </ion-content>
+     </ion-modal>
+    </script>
+    
+    <!--- image modal here ---> 
+    <script id="imagemodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false">
+    		<ion-header-bar>
+
+          <h1 class="title">{{modaltype}} Image</h1>
+
+    		</ion-header-bar>
+    		<ion-content>
+						<ion-grid>
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vname" width="10">Name:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisimage.Name" type="text" id="vname" align="left"/>
+              </div>
+            </div>
+            <div class="row ">
+              <div class="col col-20">              
+                	<label for="vdescription">Description:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thisimage.Description" type="text" id="vdescription" align="left" class="dashed-border"/>
+              </div>
+            </div>             
+						<div class="row">
+              <div class="col col-20"> 
+            		<label for="vtags"> Tags:</label>
+            	</div>
+							<div class="col  ">
+								<select   style="width:85%;" id="vtags" ng-model="thisimage.Tags" multiple  
+													ng-options="tag._id as tag.value for tag in tags" >    
+													<!-- ng-options="tag.value as tag.value for tag in tags" -->
+								</select>
+            	</div>
+						</div>            
+            
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vsource"> Source:</label>
+            	</div>
+							<div class="col">
+								<select  style="width:85%;" id="vsource" ng-model="thisimage.DataSource"
+											ng-options="source._id as source.Name for source in dataSources" ng-change="sourceChange(thisimage)">    
+								</select>
+            	</div>
+						</div>
+           	           
+            <div class="row">
+              <div class="col col-20"> 
+            		<label for="vpath"> Path from Source:</label>
+            	</div>
+							<div class="col col-50">
+								<span ng-model="thisimage.PathFromSource" id="vpath" double-click="doubleClick(thisimage,true)" class="dashed-border">{{thisimage.PathFromSource}}</span>               
+            	</div>
+           	</div>
+
+            <div class="row">
+              <div class="col"> 
+       				  <div class="button" ng-click="closeModal('image',thisimage)">Cancel <span class="icon ion-close"></span>
+          			</div>
+          			<div class="button" ng-click="saveModal('image')">Save <span class="icon ion-done-all"></span>
+          			</div>
+             	</div>
+           	</div>
+       </ion-grid>
+      </ion-content>
+     </ion-modal>
+    </script>
+ <!--- tags modal here ---> 
+    <script id="tagmodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false">
+    		<ion-header-bar>
+
+          <h1 class="title">{{modaltype}} Tag</h1>
+
+    		</ion-header-bar>
+    		<ion-content>    		
+						<ion-grid>
+						
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vdescription">Description:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thistag.Description" type="text" id="vdescription" align="left" />
+              </div>
+            </div>		
+            				
+            <div class="row">
+              <div class="col col-20">              
+                	<label for="vname" width="10">Value:</label>                             
+              </div>
+             	<div class="col dashed-border">
+         			 <input ng-model="thistag.value" type="text" id="vname" align="left"  />
+              </div>
+            </div>						
+
+            <div class="row">
+              <div class="col"> 
+       				  <div class="button" ng-click="closeModal('tag',thistag)">Cancel <span class="icon ion-close"></span>
+          			</div>
+          			<div class="button" ng-click="saveModal('tag')">Save <span class="icon ion-done-all"></span>
+          			</div>
+             	</div>
+           	</div>
+       </ion-grid>
+      </ion-content>
+     </ion-modal>
+    </script>    
+    
+     <!--- file modal here ---> 
+    <script id="filemodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false" style="width:90%; height:150%;  left: 5%; top=-20%">
+    		<ion-header-bar>
+
+          <h1 class="title"> Files</h1>
+
+    		</ion-header-bar>
+    		<ion-content>   		
+
+            <div class="row">
+              <div class="col"> 
+       				  <div class="button" ng-click="closeModal('file',null)">Cancel <span class="icon ion-close"></span></div>
+          			  <div class="button" ng-click="saveModal('file')">Save <span class="icon ion-done-all"></span>	</div>
+             	</div>
+							           	
+           	</div>
+           	<div class="row ">
+           	<div class="col dashed-border" >{{parentpath}}</div>
+						</div>
+									<div class = "row">
+										<span class="col colb col-10 center">Select</span>
+										<span class="col colb col-10 center">Type</span>
+										<span class="col colb ">Name</span>
+									</div>					
+						<ion-grid>						
+								<ion-scroll  direction="y" scrollY="true"  style="width: 100%; height: 450px; "> 						
+									<div class = "row item" ng-repeat="file in files track by $index"> 
+																		 
+										 <div class="col colb col-10 checkbox" >				<!--  --> 					
+         							 <input ng-model="file.selected" type="checkbox" id="vselected" ng-checked="isSelected(files,$index)"/> 
+            				 </div>
+										 <span class = "col colb col-10 center" >{{file.filetype}}</span> 									 
+										 <span class = "col colb" double-click="doubleClick(file,false)" 
+										 													ng-click="setClickedRow($index,'file','name')">{{file.name}}</span> 
+									</div>										
+           	</ion-scroll> 
+	       </ion-grid>     
+	      	
+      </ion-content>
+     </ion-modal>
+    </script> 
+    
+<!--  the server discovery panel --> 
+   
+    <script id="discoverymodal.html" type="text/ng-template">
+      <ion-modal-view hide-back-button="false" class="modal-wrapper box ">
+    		<ion-header-bar>
+
+          <h2> Mirror Discovery</h2>
+
+    		</ion-header-bar>
+    		<ion-content>   		
+
+            <div class="center"> Mirror Discovery in progress, please wait...</div>
+	      	
+      </ion-content>
+     </ion-modal>
+    </script>
